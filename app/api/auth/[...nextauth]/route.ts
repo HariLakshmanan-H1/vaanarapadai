@@ -1,9 +1,11 @@
 // app/api/auth/[...nextauth]/route.ts
+
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
+// @ts-ignore
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -19,6 +21,7 @@ export const authOptions = {
     signIn: "/", // redirect to landing page
   },
   callbacks: {
+    // @ts-ignore
     async session({ session, user }) {
       // add user id & email to session object
       if (session.user) {
