@@ -36,6 +36,7 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
     const checkLeader = async () => {
       const res = await fetch(`/api/room/${roomCode}`)
       const data = await res.json()
+      console.log(data);
       setIsLeader(data.isLeader)
     }
 
