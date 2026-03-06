@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/* ---------------------------------- */
+/* USER SYSTEM */
+/* ---------------------------------- */
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  name             String?
+  image            String?
+  emailVerified    DateTime?
+  createdAt        DateTime @default(now())
+
+  sessions         Session[]
+  accounts         Account[]
+  playlists        Playlist[]
+  roomParticipants RoomParticipant[]
+  votes            Vote[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+}
+
+model Account {
+  id                String @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+/* ---------------------------------- */
+/* ROOM SYSTEM */
+/* ---------------------------------- */
+
+model Room {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String
+  leaderEmail   String
+  createdAt     DateTime @default(now())
+
+  currentSongId String?  @unique
+  currentSong   RoomQueueSong? @relation("CurrentSong", fields: [currentSongId], references: [id])
+
+  participants  RoomParticipant[]
+  queue         RoomQueueSong[]
+
+  @@unique([leaderEmail, name])
+}
+
+model RoomParticipant {
+  id        String @id @default(cuid())
+  code      String
+  userEmail String
+
+  room Room @relation(fields: [code], references: [code], onDelete: Cascade)
+  user User @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+
+  @@unique([code, userEmail])
+}
+
+model RoomQueueSong {
+  id        String   @id @default(cuid())
+  code      String
+  title     String
+  youtubeId String
+  thumbnail String
+  votes     Int      @default(0)
+  played    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  room Room @relation(fields: [code], references: [code], onDelete: Cascade)
+
+  voteList Vote[]
+
+  currentInRoom Room? @relation("CurrentSong")
+
+  @@unique([code, youtubeId])
+  @@index([code, votes])
+}
+
+model Vote {
+  id        String @id @default(cuid())
+  userEmail String
+  songId    String
+
+  song RoomQueueSong @relation(fields: [songId], references: [id], onDelete: Cascade)
+  user User          @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+
+  @@unique([userEmail, songId])
+}
+
+/* ---------------------------------- */
+/* PLAYLIST SYSTEM */
+/* ---------------------------------- */
+
+model Playlist {
+  id          String   @id @default(cuid())
+  title       String
+  leaderEmail String
+  createdAt   DateTime @default(now())
+
+  leader User @relation(fields: [leaderEmail], references: [email], onDelete: Cascade)
+  songs  PlaylistSong[]
+}
+
+model PlaylistSong {
+  id         String   @id @default(cuid())
+  playlistId String
+  title      String
+  youtubeId  String
+  thumbnail  String
+  createdAt  DateTime @default(now())
+
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, youtubeId])
+}
