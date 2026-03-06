@@ -1,5 +1,5 @@
 // app/api/auth/[...nextauth]/route.ts
-
+export const dynamic = "force-dynamic"
 import NextAuth, { type NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
