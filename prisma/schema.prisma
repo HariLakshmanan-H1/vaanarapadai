@@ -120,7 +120,6 @@ model Vote {
 
 model Playlist {
   id          String   @id @default(cuid())
-  title       String
   leaderEmail String
   createdAt   DateTime @default(now())
 
