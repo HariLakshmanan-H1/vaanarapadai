@@ -1,4 +1,4 @@
-just touch the styling
+
 //app/dashboard/[code]/page.tsx
 "use client";
 
