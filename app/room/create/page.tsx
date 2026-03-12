@@ -14,13 +14,13 @@ export default function CreateRoomPage() {
   const router = useRouter()
 
   const containerRef = useRef<HTMLDivElement>(null)
-  
+
   useEffect(() => {
     if (!containerRef.current) return
-    
+
     // Select the direct children (the Create section and Join section)
     const elements = containerRef.current.children
-    
+
     gsap.fromTo(
       elements,
       { y: 30, opacity: 0 },
@@ -78,7 +78,7 @@ export default function CreateRoomPage() {
       <Header />
 
       <div ref={containerRef} className="flex flex-col items-center justify-center h-[calc(100vh-80px)] gap-12 px-6 relative z-10">
-        
+
         {/* 🔥 Create Room Section */}
         <div className="glass-panel p-10 rounded-[40px] border-emerald-500/20 shadow-2xl flex flex-col items-center gap-8 max-w-md w-full text-center">
           <div className="space-y-2">
@@ -99,7 +99,7 @@ export default function CreateRoomPage() {
               href="/playlist"
               className="w-full py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold uppercase text-[10px] tracking-widest border border-white/10 transition-all duration-300 text-center"
             >
-              Open My Library
+              Open My Playlist
             </Link>
           </div>
         </div>
