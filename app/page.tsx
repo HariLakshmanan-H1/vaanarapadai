@@ -52,17 +52,15 @@ export default function LandingPage() {
       <div className="text-center space-y-8 relative">
         {/* Decorative element */}
         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-48 h-48 bg-emerald-500/20 blur-[100px] rounded-full animate-pulse" />
-        
-        <h1 
+
+        <h1
           ref={titleRef}
           className="text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter leading-tight opacity-0 translate-y-8"
         >
           Vaanara<span className="text-emerald-500 text-glow-emerald">padai</span>
         </h1>
-        
-        <p className="text-emerald-400/60 font-medium uppercase tracking-[0.4em] text-xs sm:text-sm animate-pulse">
-          Synchronized Audio Experience
-        </p>
+
+
 
         <div ref={buttonRef} className="opacity-0 translate-y-6 pt-8">
           <button
