@@ -146,8 +146,24 @@ export async function POST(
     if (count >= 25)
       return NextResponse.json({ error: "Queue full" }, { status: 400 })
 
-    const song = await prisma.roomQueueSong.create({
-      data: { code, title, youtubeId, thumbnail }
+    const song = await prisma.roomQueueSong.upsert({
+      where: {
+        code_youtubeId: {
+          code,
+          youtubeId
+        }
+      },
+      update: {
+        played: false,
+        votes: 0,
+        createdAt: new Date() // reset timestamp so it goes to bottom
+      },
+      create: { 
+        code, 
+        title, 
+        youtubeId, 
+        thumbnail 
+      }
     })
 
     return NextResponse.json(song)
@@ -190,20 +206,15 @@ export async function PATCH(
       if (!song || song.code !== code)
         throw new Error("NOT_FOUND")
 
-      const existingVote = await tx.vote.findUnique({
-        where: {
-          userEmail_songId: {
-            userEmail,
-            songId
-          }
-        }
-      })
-
-      if (existingVote) throw new Error("ALREADY_VOTED")
-
-      await tx.vote.create({
-        data: { userEmail, songId }
-      })
+      try {
+        await tx.vote.create({
+          data: { userEmail, songId }
+        })
+      } catch (e: any) {
+        // Handle unique constraint violation (P2002) for votes gracefully
+        if (e.code === 'P2002') throw new Error("ALREADY_VOTED")
+        throw e
+      }
 
       await tx.roomQueueSong.update({
         where: { id: songId },

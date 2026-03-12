@@ -9,32 +9,44 @@ export default function Header() {
   const router = useRouter()
 
   return (
-    <header className="flex flex-col md:flex-row items-center justify-between p-4 md:p-6 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b-2 border-emerald-500 shadow-[0_4px_20px_rgba(16,185,129,0.4)] backdrop-blur-sm">
-      
+    <header className="sticky top-0 z-40 w-full glass-panel border-b border-emerald-500/30 px-6 py-4 flex items-center justify-between shadow-2xl">
       {session && (
-        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12 w-full justify-between">
+        <div className="flex items-center gap-12 w-full justify-between">
           {/* Logo & Title */}
-          <div className="flex items-center gap-4">
-            <Image
-              src="/monkey-logo.jpg"
-              alt="Vaanarapadai Logo"
-              width={64}
-              height={64}
-              className="rounded-2xl border-2 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all duration-200"
-            />
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-emerald-400 uppercase tracking-widest drop-shadow-[0_2px_6px_rgba(16,185,129,0.6)]">
-              Vaanarapadai
-            </h1>
+          <div className="flex items-center gap-5">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-2xl blur opacity-40 group-hover:opacity-75 transition duration-500 animate-pulse"></div>
+              <Image
+                src="/monkey-logo.jpg"
+                alt="Vaanarapadai Logo"
+                width={56}
+                height={56}
+                className="relative rounded-2xl border border-white/10 shadow-2xl"
+              />
+            </div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tighter leading-none">
+                Vaanara<span className="text-emerald-500 text-glow-emerald font-light">padai</span>
+              </h1>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-400 font-bold opacity-80">
+                Premium Sync Player
+              </p>
+            </div>
           </div>
 
           {/* User Info & Logout */}
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-            <p className="text-emerald-300 font-semibold text-lg sm:text-xl drop-shadow-[0_1px_3px_rgba(16,185,129,0.5)]">
-              {session.user?.name}
-            </p>
+          <div className="flex items-center gap-6">
+            <div className="hidden md:block text-right">
+              <p className="text-white font-bold text-sm uppercase tracking-tight leading-none">
+                {session.user?.name}
+              </p>
+              <p className="text-emerald-400/60 text-[10px] font-medium uppercase tracking-widest mt-1">
+                Authorized Session
+              </p>
+            </div>
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="px-5 py-2 bg-gradient-to-tr from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-900 font-black uppercase rounded-2xl shadow-[0_0_12px_rgba(16,185,129,0.5)] border-2 border-emerald-400 hover:border-emerald-300 transition-all duration-200 active:scale-95"
+              className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black uppercase text-xs rounded-full shadow-lg shadow-emerald-500/20 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95"
             >
               Logout
             </button>

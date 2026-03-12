@@ -7,6 +7,7 @@ export interface Song {
   code: string
   title: string
   youtubeId: string
+  thumbnail: string
   votes: number
   createdAt: number
   played: boolean

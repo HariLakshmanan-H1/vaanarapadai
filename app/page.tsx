@@ -48,20 +48,32 @@ export default function LandingPage() {
   }
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-emerald-400">
-      <h1 
-        ref={titleRef}
-        className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-emerald-400 uppercase tracking-widest drop-shadow-[0_2px_6px_rgba(16,185,129,0.6)]">
-              Vaanarapadai
-            </h1>
+    <main className="flex flex-col items-center justify-center min-h-screen bg-transparent text-white px-6">
+      <div className="text-center space-y-8 relative">
+        {/* Decorative element */}
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-48 h-48 bg-emerald-500/20 blur-[100px] rounded-full animate-pulse" />
+        
+        <h1 
+          ref={titleRef}
+          className="text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter leading-tight opacity-0 translate-y-8"
+        >
+          Vaanara<span className="text-emerald-500 text-glow-emerald">padai</span>
+        </h1>
+        
+        <p className="text-emerald-400/60 font-medium uppercase tracking-[0.4em] text-xs sm:text-sm animate-pulse">
+          Synchronized Audio Experience
+        </p>
 
-      <button
-        ref={buttonRef}
-        onClick={() => signIn("google")}
-        className="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-lg shadow-lg shadow-emerald-500/40 transition active:scale-95 translate-y-6 opacity-0"
-      >
-        Sign in with Google
-      </button>
+        <div ref={buttonRef} className="opacity-0 translate-y-6 pt-8">
+          <button
+            onClick={() => signIn("google")}
+            className="group relative px-10 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black uppercase text-sm rounded-full shadow-2xl shadow-emerald-500/20 transition-all duration-300 transform hover:-translate-y-1 active:scale-95 overflow-hidden"
+          >
+            <span className="relative z-10">Connect with Google</span>
+            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+          </button>
+        </div>
+      </div>
     </main>
   )
 }

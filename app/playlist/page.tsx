@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { useYouTubeMeta } from "@/hooks/useYouTubeMeta";
 import Header from "@/components/Header";
 import Link from "next/link";
+import gsap from "gsap";
+import { useRef } from "react";
 
 interface Song {
   id: string;
@@ -25,6 +27,21 @@ export default function PlaylistPage() {
 
   const { getMeta, loading: metaLoading, error: metaError } =
     useYouTubeMeta();
+
+  // ===============================
+  // GSAP Animations
+  // ===============================
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!loading && containerRef.current) {
+      gsap.fromTo(
+        containerRef.current.children,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power2.out" }
+      );
+    }
+  }, [loading]);
 
   // ===============================
   // Fetch Playlist
@@ -126,7 +143,7 @@ export default function PlaylistPage() {
       <div className="p-6 max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">My Playlist</h1>
 
-        <div className="flex gap-8">
+        <div ref={containerRef} className="flex gap-8 flex-col lg:flex-row">
           {/* LEFT: Song Grid */}
           <div className="flex-1">
             {loading ? (

@@ -7,10 +7,13 @@ export const metadata = {
   description: "Music queue app",
 }
 
+import BackgroundAtmosphere from "@/components/BackgroundAtmosphere"
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className="antialiased">
+        <BackgroundAtmosphere />
         <Providers>
           {children}
         </Providers>
