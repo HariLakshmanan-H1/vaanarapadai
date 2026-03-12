@@ -79,11 +79,11 @@ export default function CreateRoomPage() {
 
       <div ref={containerRef} className="flex flex-col items-center justify-center h-[calc(100vh-80px)] gap-12 px-6 relative z-10">
 
-        {/* 🔥 Create Room Section */}
+        {/*  Create Room Section */}
         <div className="glass-panel p-10 rounded-[40px] border-emerald-500/20 shadow-2xl flex flex-col items-center gap-8 max-w-md w-full text-center">
           <div className="space-y-2">
             <h2 className="text-xl font-black uppercase tracking-[0.4em] text-emerald-500">Host Room</h2>
-            <p className="text-white/40 text-xs font-medium">Start a new synchronized session</p>
+            <p className="text-white/40 text-xs font-medium">Shall we start?</p>
           </div>
 
           <div className="flex flex-col w-full gap-4">
@@ -104,7 +104,7 @@ export default function CreateRoomPage() {
           </div>
         </div>
 
-        {/* 🚪 Join Room Section */}
+        {/* Join Room Section */}
         <div className="w-full max-w-xs flex flex-col items-center gap-6">
           <div className="relative w-full">
             <input

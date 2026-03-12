@@ -28,9 +28,7 @@ export default function Header() {
               <h1 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tighter leading-none">
                 Vaanara<span className="text-emerald-500 text-glow-emerald font-light">padai</span>
               </h1>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-400 font-bold opacity-80">
-                Premium Sync Player
-              </p>
+
             </div>
           </div>
 
@@ -40,9 +38,7 @@ export default function Header() {
               <p className="text-white font-bold text-sm uppercase tracking-tight leading-none">
                 {session.user?.name}
               </p>
-              <p className="text-emerald-400/60 text-[10px] font-medium uppercase tracking-widest mt-1">
-                Authorized Session
-              </p>
+
             </div>
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
