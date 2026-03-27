@@ -10,7 +10,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { roomCode, action, timestamp, videoId } = await req.json()
+    const { roomCode, action, timestamp, videoId, sentAt } = await req.json()
 
     if (!roomCode || !action) {
       return NextResponse.json(
@@ -25,6 +25,7 @@ export async function POST(req: Request) {
       action,
       timestamp,
       videoId,
+      sentAt,
       leaderEmail: session.user.email,
     })
 

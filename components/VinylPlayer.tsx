@@ -38,7 +38,7 @@ export default function VinylPlayer({ songTitle }: VinylPlayerProps) {
 
   return (
     <div className="w-full h-full flex items-center justify-center p-8">
-      <svg width="420" height="420" viewBox="0 0 400 400" className="filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+      <svg width="420" height="420" viewBox="0 0 400 400" className="opacity-80">
         <defs>
           <linearGradient id="metal-shine" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 0.1 }} />
@@ -47,8 +47,7 @@ export default function VinylPlayer({ songTitle }: VinylPlayerProps) {
           </linearGradient>
           <radialGradient id="vinyl-texture" cx="50%" cy="50%" r="50%">
             <stop offset="0%" style={{ stopColor: "#1a1a1a", stopOpacity: 1 }} />
-            <stop offset="95%" style={{ stopColor: "#0a0a0a", stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: "#10b981", stopOpacity: 0.2 }} />
+            <stop offset="100%" style={{ stopColor: "#0a0a0a", stopOpacity: 1 }} />
           </radialGradient>
         </defs>
 
@@ -71,13 +70,13 @@ export default function VinylPlayer({ songTitle }: VinylPlayerProps) {
           {/* Main Disc */}
           <circle cx="200" cy="200" r="145" fill="url(#vinyl-texture)" />
           
-          {/* Grooves */}
-          {[...Array(8)].map((_, i) => (
+          {/* Grooves (Reduced for performance) */}
+          {[...Array(3)].map((_, i) => (
             <circle
               key={i}
               cx="200"
               cy="200"
-              r={60 + i * 10}
+              r={80 + i * 20}
               fill="none"
               stroke="white"
               strokeWidth="0.5"
@@ -111,10 +110,10 @@ export default function VinylPlayer({ songTitle }: VinylPlayerProps) {
         </g>
 
         {/* Shine Overlay */}
-        <circle cx="200" cy="200" r="145" fill="url(#metal-shine)" pointerEvents="none" />
+        <circle cx="200" cy="200" r="145" fill="url(#metal-shine)" pointerEvents="none" opacity="0.5" />
 
         {/* Tone Arm Assembly */}
-        <g className="filter drop-shadow-lg">
+        <g>
           <circle cx="320" cy="70" r="12" fill="#1e293b" />
           <circle cx="320" cy="70" r="6" fill="#10b981" />
 

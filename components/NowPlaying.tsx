@@ -19,6 +19,7 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
   const playerRef = useRef<any>(null)
 
   const previousSongId = useRef<string | null>(null)
+  const hasSyncedRef = useRef<boolean>(false)
 
   // Only remount if actual song changes
   useEffect(() => {
@@ -26,6 +27,7 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
 
     if (previousSongId.current !== song.id) {
       previousSongId.current = song.id
+      hasSyncedRef.current = false
       setPlayerKey((prev) => prev + 1)
 
       const container = document.getElementById("now-playing-container")
@@ -67,7 +69,13 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
     fetch(`/api/room/sync`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomCode, action, timestamp, videoId: song.youtubeId }),
+      body: JSON.stringify({ 
+        roomCode, 
+        action, 
+        timestamp, 
+        videoId: song.youtubeId,
+        sentAt: Date.now() 
+      }),
     }).catch(console.error)
   }
 
@@ -83,7 +91,7 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
             broadcastSync("SYNC", time)
         }
       }
-    }, 2000)
+    }, 1000)
 
     return () => clearInterval(interval)
   }, [isLeader, song, playerKey])
@@ -95,21 +103,32 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
     const pusherClient = getPusherClient()
     const channel = pusherClient.subscribe(channelName)
 
-    channel.bind("sync", (data: { action: string, timestamp: number, videoId: string }) => {
+    channel.bind("sync", (data: { action: string, timestamp: number, videoId: string, sentAt?: number }) => {
       if (!playerRef.current || !song || data.videoId !== song.youtubeId) return
 
       const currentTime = playerRef.current.getCurrentTime()
-      const timeDiff = Math.abs(currentTime - data.timestamp)
+      
+      // Latency Compensation
+      const networkDelay = data.sentAt ? (Date.now() - data.sentAt) / 1000 : 0
+      const adjustedTarget = data.timestamp + networkDelay
+      
+      const timeDiff = Math.abs(currentTime - adjustedTarget)
+
+      // Only sync if it's the first sync (tight threshold) or heartbeat (loose threshold)
+      // Loose threshold (5s) prevents constant "seeking" stutters while playing
+      const threshold = hasSyncedRef.current ? 5 : 0.5
 
       if (data.action === "PLAY") {
         playerRef.current.playVideo()
-        if (timeDiff > 2) playerRef.current.seekTo(data.timestamp)
+        if (timeDiff > threshold) playerRef.current.seekTo(adjustedTarget)
+        hasSyncedRef.current = true
       } else if (data.action === "PAUSE") {
         playerRef.current.pauseVideo()
-        if (timeDiff > 2) playerRef.current.seekTo(data.timestamp)
+        if (timeDiff > threshold) playerRef.current.seekTo(adjustedTarget)
       } else if (data.action === "SYNC") {
-        if (timeDiff > 2) {
-          playerRef.current.seekTo(data.timestamp)
+        if (timeDiff > threshold) {
+          playerRef.current.seekTo(adjustedTarget)
+          hasSyncedRef.current = true
         }
       }
     })
