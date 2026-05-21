@@ -58,9 +58,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Center Column: Chat Box Placeholder (Future implementation) */}
-        <div className="flex flex-col h-full bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl relative overflow-hidden group min-h-[400px]">
+        <div className="flex flex-col h-full bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-2xl p-4 shadow-2xl relative overflow-hidden group min-h-[400px]">
           {/* Ambient Glow */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full pointer-events-none" />
           
           <div className="relative z-10 flex flex-col h-full justify-between">
             {/* Chat Header */}
@@ -114,8 +114,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Glassmorphic Overlay notifying user of upcoming feature */}
-            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center z-20">
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-full mb-3 text-emerald-400 shadow-inner animate-bounce">
+            <div className="absolute inset-0 bg-slate-950/75 flex flex-col items-center justify-center p-6 text-center z-20">
+              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-full mb-3 text-emerald-400 shadow-inner">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>

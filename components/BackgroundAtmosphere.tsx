@@ -10,23 +10,22 @@ export default function BackgroundAtmosphere() {
     if (!containerRef.current) return
 
     const orbs = containerRef.current.querySelectorAll(".orb")
-    
+
     orbs.forEach((orb) => {
-      // Random movement
+      // Slow, gentle movement — keeps the scene alive without hammering the GPU
       gsap.to(orb, {
-        x: "random(-100, 100)",
-        y: "random(-100, 100)",
-        duration: "random(10, 20)",
+        x: "random(-80, 80)",
+        y: "random(-80, 80)",
+        duration: "random(12, 22)",
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut",
       })
 
-      // Random pulse
+      // Soft pulse in opacity only — no scale changes that would invalidate blur layers
       gsap.to(orb, {
-        scale: "random(0.8, 1.2)",
-        opacity: "random(0.1, 0.3)",
-        duration: "random(5, 10)",
+        opacity: "random(0.6, 1.0)",
+        duration: "random(6, 12)",
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut",
@@ -35,26 +34,57 @@ export default function BackgroundAtmosphere() {
   }, [])
 
   return (
-    <div ref={containerRef} className="fixed inset-0 overflow-hidden pointer-events-none -z-10 bg-slate-950">
-      {/* Subtle Noise */}
+    <div
+      ref={containerRef}
+      className="fixed inset-0 overflow-hidden pointer-events-none -z-10 bg-slate-950"
+    >
+      {/* Static noise overlay (cheap PNG texture, not SVG feTurbulence) */}
       <div className="noise-overlay transform-gpu" />
-      
-      {/* Animated Orbs - Hardware Accelerated to prevent layout thrashing */}
-      <div 
-        className="orb absolute top-[10%] left-[15%] w-[40vw] h-[40vw] rounded-full bg-emerald-500/10 blur-[120px] transform-gpu will-change-transform" 
-        style={{ willChange: "transform, opacity" }}
+
+      {/*
+        Orbs — each one is a radial-gradient instead of a solid colour + blur filter.
+        Radial gradients are rasterised once as a texture and composited by the GPU
+        without any per-frame filter arithmetic, so they are essentially free to animate.
+      */}
+
+      {/* Top-left large emerald orb */}
+      <div
+        className="orb absolute top-[10%] left-[15%] w-[45vw] h-[45vw] rounded-full transform-gpu"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(16,185,129,0.13) 0%, rgba(16,185,129,0.04) 45%, transparent 70%)",
+          willChange: "transform, opacity",
+        }}
       />
-      <div 
-        className="orb absolute top-[60%] left-[60%] w-[35vw] h-[35vw] rounded-full bg-emerald-400/5 blur-[100px] transform-gpu will-change-transform" 
-        style={{ willChange: "transform, opacity" }}
+
+      {/* Bottom-right medium orb */}
+      <div
+        className="orb absolute top-[55%] left-[58%] w-[38vw] h-[38vw] rounded-full transform-gpu"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.02) 50%, transparent 70%)",
+          willChange: "transform, opacity",
+        }}
       />
-      <div 
-        className="orb absolute top-[20%] left-[70%] w-[30vw] h-[30vw] rounded-full bg-slate-800/20 blur-[90px] transform-gpu will-change-transform" 
-        style={{ willChange: "transform, opacity" }}
+
+      {/* Top-right subtle slate orb */}
+      <div
+        className="orb absolute top-[15%] left-[68%] w-[32vw] h-[32vw] rounded-full transform-gpu"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(30,41,59,0.35) 0%, rgba(30,41,59,0.1) 50%, transparent 70%)",
+          willChange: "transform, opacity",
+        }}
       />
-      <div 
-        className="orb absolute top-[80%] left-[20%] w-[25vw] h-[25vw] rounded-full bg-emerald-600/5 blur-[80px] transform-gpu will-change-transform" 
-        style={{ willChange: "transform, opacity" }}
+
+      {/* Bottom-left faint accent orb */}
+      <div
+        className="orb absolute top-[75%] left-[18%] w-[28vw] h-[28vw] rounded-full transform-gpu"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 65%)",
+          willChange: "transform, opacity",
+        }}
       />
     </div>
   )

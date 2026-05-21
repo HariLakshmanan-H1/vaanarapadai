@@ -13,6 +13,13 @@ interface Props {
   roomCode: string
 }
 
+// How long between background SYNC heartbeats (ms)
+const HEARTBEAT_MS = 10_000
+
+// Seek thresholds — only seek if drift exceeds this amount
+const SYNC_THRESHOLD_FIRST = 2    // seconds — tight, for initial join / PLAY / PAUSE
+const SYNC_THRESHOLD_HEARTBEAT = 5 // seconds — loose, for background heartbeats
+
 export default function NowPlaying({ song, onEnd, roomCode }: Props) {
   const [playerKey, setPlayerKey] = useState(0)
   const [isLeader, setIsLeader] = useState(false)
@@ -20,6 +27,8 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
 
   const previousSongId = useRef<string | null>(null)
   const hasSyncedRef = useRef<boolean>(false)
+  // Prevents the skip button from firing twice in rapid succession
+  const skipPendingRef = useRef<boolean>(false)
 
   // Only remount if actual song changes
   useEffect(() => {
@@ -51,15 +60,20 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
   }, [roomCode])
 
   const handleEnd = async () => {
-    if (!song || !isLeader) return
+    if (!song || !isLeader || skipPendingRef.current) return
+    skipPendingRef.current = true
 
-    await fetch("/api/songs/delete", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ songId: song.id, code: roomCode }),
-    })
-
-    onEnd()
+    try {
+      await fetch("/api/songs/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ songId: song.id, code: roomCode }),
+      })
+      onEnd()
+    } finally {
+      // Re-enable after 1.5 s so rapid double-click doesn't queue two skips
+      setTimeout(() => { skipPendingRef.current = false }, 1500)
+    }
   }
 
   // Broadcast sync events to participants (Leader only)
@@ -79,21 +93,29 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
     }).catch(console.error)
   }
 
-  // Heartbeat interval for the leader (every 10 seconds to avoid over-seeking)
+  // Heartbeat interval for the leader
   useEffect(() => {
-    if (!isLeader || !playerRef.current) return
+    if (!isLeader) return
 
-    const interval = setInterval(() => {
-      if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
-        const time = playerRef.current.getCurrentTime()
-        // Only broadcast if the player is actively playing
-        if (playerRef.current.getPlayerState() === 1) { // 1 is playing
-            broadcastSync("SYNC", time)
+    let intervalId: ReturnType<typeof setInterval> | null = null
+
+    // Wait briefly for playerRef to be populated after onReady fires
+    const timeoutId = setTimeout(() => {
+      intervalId = setInterval(() => {
+        if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
+          const state = playerRef.current.getPlayerState()
+          // Only broadcast while actively playing (state 1). Skip if buffering (state 3).
+          if (state === 1) {
+            broadcastSync("SYNC", playerRef.current.getCurrentTime())
+          }
         }
-      }
-    }, 10000)
+      }, HEARTBEAT_MS)
+    }, 2000) // 2 s grace period so player is ready before first heartbeat
 
-    return () => clearInterval(interval)
+    return () => {
+      clearTimeout(timeoutId)
+      if (intervalId) clearInterval(intervalId)
+    }
   }, [isLeader, song?.id, playerKey])
 
   useEffect(() => {
@@ -106,28 +128,37 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
     channel.bind("sync", (data: { action: string, timestamp: number, videoId: string, sentAt?: number }) => {
       if (!playerRef.current || !song || data.videoId !== song.youtubeId) return
 
+      // If the player is currently buffering (state 3), skip this event entirely.
+      // Seeking into a buffering player restarts the buffer from scratch and causes stutter.
+      const playerState = playerRef.current.getPlayerState()
+      const isBuffering = playerState === 3
+
       const currentTime = playerRef.current.getCurrentTime()
-      
-      // Directly use the leader's video timestamp. Pusher latency is negligible (50-200ms),
-      // which is far better than using unsynchronized system clocks for latency calculations.
-      const adjustedTarget = data.timestamp
-      
+
+      // Compensate for network latency using the sentAt timestamp the leader attached.
+      // This gives us a much better estimate of where the leader's video actually is right now.
+      const networkDelaySec = data.sentAt ? (Date.now() - data.sentAt) / 1000 : 0
+      const adjustedTarget = data.timestamp + networkDelaySec
+
       const timeDiff = Math.abs(currentTime - adjustedTarget)
 
-      // Only sync if the difference exceeds our threshold:
-      // - 1.5s for initial join/playback command to allow smooth load-in.
-      // - 3s for background heartbeats to prevent stuttering from minor network drift.
-      const threshold = hasSyncedRef.current ? 3 : 1.5
-
+      // Dual thresholds:
+      // - PLAY / PAUSE: always use the tight threshold so explicit leader actions feel instant.
+      // - SYNC (heartbeat): use a loose threshold so minor drift doesn't trigger constant seeks.
       if (data.action === "PLAY") {
         playerRef.current.playVideo()
-        if (timeDiff > threshold) playerRef.current.seekTo(adjustedTarget, true)
+        if (!isBuffering && timeDiff > SYNC_THRESHOLD_FIRST) {
+          playerRef.current.seekTo(adjustedTarget, true)
+        }
         hasSyncedRef.current = true
       } else if (data.action === "PAUSE") {
         playerRef.current.pauseVideo()
-        if (timeDiff > threshold) playerRef.current.seekTo(adjustedTarget, true)
+        if (!isBuffering && timeDiff > SYNC_THRESHOLD_FIRST) {
+          playerRef.current.seekTo(adjustedTarget, true)
+        }
       } else if (data.action === "SYNC") {
-        if (timeDiff > threshold) {
+        // Only seek on heartbeat if the drift is large AND the player isn't buffering
+        if (!isBuffering && timeDiff > SYNC_THRESHOLD_HEARTBEAT) {
           playerRef.current.seekTo(adjustedTarget, true)
           hasSyncedRef.current = true
         }
