@@ -140,17 +140,21 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
   }, [isLeader, roomCode, song?.id, playerKey])
 
 
-  if (!song) return <div>Queue Empty</div>
+  if (!song) {
+    return (
+      <div className="relative w-full h-full min-h-[300px] flex flex-col items-center justify-center">
+        <div className="absolute inset-0 pointer-events-none z-0 opacity-40">
+          <VinylPlayer songTitle="Waiting for songs..." />
+        </div>
+        <div className="relative z-10 text-slate-400 font-medium text-lg">
+          Queue Empty. Add a song to start!
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="relative w-full h-full flex flex-col">
-
-      {/* Vinyl always spins if song exists */}
-      {!isLeader && (
-        <div className="absolute inset-0 opacity-40 pointer-events-none z-0">
-          <VinylPlayer songTitle={song.title} />
-        </div>
-      )}
 
       <div
         id="now-playing-container"
@@ -162,7 +166,7 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
           Participants get a pointer-events-none container to prevent native 
           interactions un-syncing the state 
         */}
-        <div className={!isLeader ? "pointer-events-none" : ""}>
+        <div className={`relative z-10 transform-gpu ${!isLeader ? "pointer-events-none" : ""}`}>
           <YouTube
             key={playerKey}
             videoId={song.youtubeId}

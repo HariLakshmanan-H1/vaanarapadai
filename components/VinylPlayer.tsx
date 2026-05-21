@@ -37,8 +37,8 @@ export default function VinylPlayer({ songTitle }: VinylPlayerProps) {
 }, [])
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-8">
-      <svg width="420" height="420" viewBox="0 0 400 400" className="opacity-80">
+    <div className="w-full h-full flex items-center justify-center p-8 transform-gpu">
+      <svg width="420" height="420" viewBox="0 0 400 400" className="opacity-80 transform-gpu will-change-transform">
         <defs>
           <linearGradient id="metal-shine" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 0.1 }} />
