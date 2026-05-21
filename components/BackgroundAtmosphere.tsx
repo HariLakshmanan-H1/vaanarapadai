@@ -37,20 +37,24 @@ export default function BackgroundAtmosphere() {
   return (
     <div ref={containerRef} className="fixed inset-0 overflow-hidden pointer-events-none -z-10 bg-slate-950">
       {/* Subtle Noise */}
-      <div className="noise-overlay" />
+      <div className="noise-overlay transform-gpu" />
       
-      {/* Animated Orbs */}
+      {/* Animated Orbs - Hardware Accelerated to prevent layout thrashing */}
       <div 
-        className="orb absolute top-[10%] left-[15%] w-[40vw] h-[40vw] rounded-full bg-emerald-500/10 blur-[120px]" 
+        className="orb absolute top-[10%] left-[15%] w-[40vw] h-[40vw] rounded-full bg-emerald-500/10 blur-[120px] transform-gpu will-change-transform" 
+        style={{ willChange: "transform, opacity" }}
       />
       <div 
-        className="orb absolute top-[60%] left-[60%] w-[35vw] h-[35vw] rounded-full bg-emerald-400/5 blur-[100px]" 
+        className="orb absolute top-[60%] left-[60%] w-[35vw] h-[35vw] rounded-full bg-emerald-400/5 blur-[100px] transform-gpu will-change-transform" 
+        style={{ willChange: "transform, opacity" }}
       />
       <div 
-        className="orb absolute top-[20%] left-[70%] w-[30vw] h-[30vw] rounded-full bg-slate-800/20 blur-[90px]" 
+        className="orb absolute top-[20%] left-[70%] w-[30vw] h-[30vw] rounded-full bg-slate-800/20 blur-[90px] transform-gpu will-change-transform" 
+        style={{ willChange: "transform, opacity" }}
       />
       <div 
-        className="orb absolute top-[80%] left-[20%] w-[25vw] h-[25vw] rounded-full bg-emerald-600/5 blur-[80px]" 
+        className="orb absolute top-[80%] left-[20%] w-[25vw] h-[25vw] rounded-full bg-emerald-600/5 blur-[80px] transform-gpu will-change-transform" 
+        style={{ willChange: "transform, opacity" }}
       />
     </div>
   )
