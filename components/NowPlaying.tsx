@@ -154,48 +154,75 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col">
-
+    <div className="relative w-full flex flex-col items-start">
       <div
         id="now-playing-container"
-        className="relative z-10 flex flex-col space-y-4"
+        className="relative z-10 flex flex-col space-y-4 w-full"
       >
-        <h2 className="text-xl font-semibold mb-2">Now Playing</h2>
+        <h2 className="text-xl font-bold text-slate-100 uppercase tracking-wider border-b border-emerald-500/20 pb-2">
+          Now Playing
+        </h2>
 
-        {/* 
-          Participants get a pointer-events-none container to prevent native 
-          interactions un-syncing the state 
-        */}
-        <div className={`relative z-10 transform-gpu ${!isLeader ? "pointer-events-none" : ""}`}>
-          <YouTube
-            key={playerKey}
-            videoId={song.youtubeId}
-            opts={{ playerVars: { autoplay: 1 } }}
-            className="w-full aspect-video rounded-xl overflow-hidden shadow-2xl"
-            iframeClassName="w-full h-full"
-            onReady={(e) => {
-              playerRef.current = e.target
-            }}
-            onPlay={(e) => {
-              if (isLeader) broadcastSync("PLAY", e.target.getCurrentTime())
-            }}
-            onPause={(e) => {
-              if (isLeader) broadcastSync("PAUSE", e.target.getCurrentTime())
-            }}
-            onEnd={() => {
-              if (isLeader) handleEnd()
-            }}
-          />
+        {/* YouTube Miniplayer Container */}
+        <div className="flex flex-col space-y-3 w-full max-w-[360px]">
+          <div className="relative group rounded-2xl overflow-hidden border border-white/10 bg-slate-950/60 shadow-2xl transition-all duration-300 hover:border-emerald-500/30 hover:shadow-emerald-500/5">
+            {/* Aspect Video Container */}
+            <div className={`relative aspect-video w-full ${!isLeader ? "pointer-events-none" : ""}`}>
+              <YouTube
+                key={playerKey}
+                videoId={song.youtubeId}
+                opts={{ 
+                  playerVars: { 
+                    autoplay: 1,
+                    modestbranding: 1,
+                    rel: 0,
+                    controls: 1
+                  } 
+                }}
+                className="w-full h-full"
+                iframeClassName="w-full h-full object-cover"
+                onReady={(e) => {
+                  playerRef.current = e.target
+                }}
+                onPlay={(e) => {
+                  if (isLeader) broadcastSync("PLAY", e.target.getCurrentTime())
+                }}
+                onPause={(e) => {
+                  if (isLeader) broadcastSync("PAUSE", e.target.getCurrentTime())
+                }}
+                onEnd={() => {
+                  if (isLeader) handleEnd()
+                }}
+              />
+            </div>
+            
+            {/* Info bar on the player simulating a miniplayer description overlay */}
+            <div className="p-3 bg-slate-900/90 border-t border-white/5 flex flex-col gap-0.5">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="font-bold text-slate-200 text-sm truncate flex-1" title={song.title}>
+                  {song.title}
+                </h3>
+                <span className="flex-shrink-0 flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 truncate">
+                Now Playing • YouTube Video
+              </p>
+            </div>
+          </div>
+
+          {/* Skip Button matching the exact width of the player */}
+          {isLeader && (
+            <button
+              onClick={handleEnd}
+              className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-950/20 active:scale-[0.98] flex items-center justify-center gap-2 text-sm cursor-pointer"
+            >
+              <span>⊳ Skip to Next</span>
+            </button>
+          )}
         </div>
-
-        {isLeader && (
-           <button
-             onClick={handleEnd}
-             className="px-4 py-2 bg-emerald-500 text-slate-900 rounded-lg font-bold mt-4"
-           >
-             ⊳ Skip to Next
-           </button>
-        )}
       </div>
     </div>
   )
