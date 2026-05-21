@@ -94,7 +94,7 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
     }, 10000)
 
     return () => clearInterval(interval)
-  }, [isLeader, song, playerKey])
+  }, [isLeader, song?.id, playerKey])
 
   useEffect(() => {
     if (isLeader) return
@@ -137,7 +137,7 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
     return () => {
       pusherClient.unsubscribe(channelName)
     }
-  }, [isLeader, roomCode, song, playerKey])
+  }, [isLeader, roomCode, song?.id, playerKey])
 
 
   if (!song) return <div>Queue Empty</div>

@@ -50,17 +50,21 @@ export function useQueue(code: string) {
       }))
     )
 
-    setActiveSong(
-      currentSong
-        ? {
-            ...currentSong,
-            createdAt: new Date(currentSong.createdAt).getTime(),
-            played: currentSong.played ?? false,
-          }
-        : null
+    const newActiveSong = currentSong
+      ? {
+          ...currentSong,
+          createdAt: new Date(currentSong.createdAt).getTime(),
+          played: currentSong.played ?? false,
+        }
+      : null
+
+    setActiveSong((prev) => 
+      JSON.stringify(prev) === JSON.stringify(newActiveSong) ? prev : newActiveSong
     )
 
-    setQueue(normalizedQueue)
+    setQueue((prev) => 
+      JSON.stringify(prev) === JSON.stringify(normalizedQueue) ? prev : normalizedQueue
+    )
     setError(null)
   } catch (err: any) {
     setError(err.message || "Failed to load queue")
