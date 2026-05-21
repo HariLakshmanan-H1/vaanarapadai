@@ -79,7 +79,7 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
     }).catch(console.error)
   }
 
-  // Heartbeat interval for the leader
+  // Heartbeat interval for the leader (every 10 seconds to avoid over-seeking)
   useEffect(() => {
     if (!isLeader || !playerRef.current) return
 
@@ -91,7 +91,7 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
             broadcastSync("SYNC", time)
         }
       }
-    }, 1000)
+    }, 10000)
 
     return () => clearInterval(interval)
   }, [isLeader, song, playerKey])
@@ -108,26 +108,27 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
 
       const currentTime = playerRef.current.getCurrentTime()
       
-      // Latency Compensation
-      const networkDelay = data.sentAt ? (Date.now() - data.sentAt) / 1000 : 0
-      const adjustedTarget = data.timestamp + networkDelay
+      // Directly use the leader's video timestamp. Pusher latency is negligible (50-200ms),
+      // which is far better than using unsynchronized system clocks for latency calculations.
+      const adjustedTarget = data.timestamp
       
       const timeDiff = Math.abs(currentTime - adjustedTarget)
 
-      // Only sync if it's the first sync (tight threshold) or heartbeat (loose threshold)
-      // Loose threshold (5s) prevents constant "seeking" stutters while playing
-      const threshold = hasSyncedRef.current ? 5 : 0.5
+      // Only sync if the difference exceeds our threshold:
+      // - 1.5s for initial join/playback command to allow smooth load-in.
+      // - 3s for background heartbeats to prevent stuttering from minor network drift.
+      const threshold = hasSyncedRef.current ? 3 : 1.5
 
       if (data.action === "PLAY") {
         playerRef.current.playVideo()
-        if (timeDiff > threshold) playerRef.current.seekTo(adjustedTarget)
+        if (timeDiff > threshold) playerRef.current.seekTo(adjustedTarget, true)
         hasSyncedRef.current = true
       } else if (data.action === "PAUSE") {
         playerRef.current.pauseVideo()
-        if (timeDiff > threshold) playerRef.current.seekTo(adjustedTarget)
+        if (timeDiff > threshold) playerRef.current.seekTo(adjustedTarget, true)
       } else if (data.action === "SYNC") {
         if (timeDiff > threshold) {
-          playerRef.current.seekTo(adjustedTarget)
+          playerRef.current.seekTo(adjustedTarget, true)
           hasSyncedRef.current = true
         }
       }
