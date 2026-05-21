@@ -170,7 +170,9 @@ export default function NowPlaying({ song, onEnd, roomCode }: Props) {
           <YouTube
             key={playerKey}
             videoId={song.youtubeId}
-            opts={{ width: "100%", playerVars: { autoplay: 1 } }}
+            opts={{ playerVars: { autoplay: 1 } }}
+            className="w-full aspect-video rounded-xl overflow-hidden shadow-2xl"
+            iframeClassName="w-full h-full"
             onReady={(e) => {
               playerRef.current = e.target
             }}
