@@ -206,3 +206,15 @@
   background-color: rgba(2, 6, 23, 0.8) !important;
   /* Slate-950/80 */
 }
+
+.stream-custom-theme .str-chat {
+  height: 100%;
+}
+
+.stream-custom-theme .str-chat__main-panel {
+  height: 100%;
+}
+
+.stream-custom-theme .str-chat-container {
+  height: 100%;
+}
