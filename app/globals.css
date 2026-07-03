@@ -207,14 +207,24 @@
   /* Slate-950/80 */
 }
 
+
 .stream-custom-theme .str-chat {
-  height: 100%;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .stream-custom-theme .str-chat__main-panel {
-  height: 100%;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  /* CRITICAL: allows the panel to shrink and scroll */
 }
 
-.stream-custom-theme .str-chat-container {
-  height: 100%;
+/* Force the message list itself to scroll and fill the remaining space */
+.stream-custom-theme .str-chat__message-list {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
 }
