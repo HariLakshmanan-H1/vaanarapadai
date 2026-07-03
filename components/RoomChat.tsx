@@ -92,7 +92,7 @@ export default function RoomChat({ roomCode }: RoomChatProps) {
     }
 
     return (
-        <div className="flex flex-col h-full bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-2xl shadow-2xl overflow-hidden min-h-[400px] stream-custom-theme">
+        <div className="flex flex-col h-full max-h-full flex-1 min-h-0 bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-2xl shadow-2xl overflow-hidden stream-custom-theme">
             <Chat client={chatClient} theme="str-chat__theme-dark">
                 <Channel channel={channel}>
                     <Window>
