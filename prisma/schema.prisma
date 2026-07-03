@@ -6,22 +6,17 @@ datasource db {
   provider = "postgresql"
 }
 
-/* ---------------------------------- */
-/* USER SYSTEM */
-/* ---------------------------------- */
-
 model User {
-  id               String   @id @default(cuid())
-  email            String   @unique
+  id               String            @id @default(cuid())
+  email            String            @unique
   name             String?
   image            String?
   emailVerified    DateTime?
-  createdAt        DateTime @default(now())
-
-  sessions         Session[]
+  createdAt        DateTime          @default(now())
   accounts         Account[]
   playlists        Playlist[]
   roomParticipants RoomParticipant[]
+  sessions         Session[]
   votes            Vote[]
 }
 
@@ -29,12 +24,12 @@ model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
-  id                String @id @default(cuid())
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -46,26 +41,19 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-/* ---------------------------------- */
-/* ROOM SYSTEM */
-/* ---------------------------------- */
-
 model Room {
-  id            String   @id @default(cuid())
-  code          String   @unique
+  id            String            @id @default(cuid())
   name          String
   leaderEmail   String
-  createdAt     DateTime @default(now())
-
-  currentSongId String?  @unique
-  currentSong   RoomQueueSong? @relation("CurrentSong", fields: [currentSongId], references: [id])
-
+  createdAt     DateTime          @default(now())
+  code          String            @unique
+  currentSongId String?           @unique
+  currentSong   RoomQueueSong?    @relation("CurrentSong", fields: [currentSongId], references: [id])
   participants  RoomParticipant[]
   queue         RoomQueueSong[]
 
@@ -76,55 +64,45 @@ model RoomParticipant {
   id        String @id @default(cuid())
   code      String
   userEmail String
-
-  room Room @relation(fields: [code], references: [code], onDelete: Cascade)
-  user User @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  room      Room   @relation(fields: [code], references: [code], onDelete: Cascade)
+  user      User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
   @@unique([code, userEmail])
 }
 
 model RoomQueueSong {
-  id        String   @id @default(cuid())
-  code      String
-  title     String
-  youtubeId String
-  thumbnail String
-  votes     Int      @default(0)
-  played    Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  room Room @relation(fields: [code], references: [code], onDelete: Cascade)
-
-  voteList Vote[]
-
-  currentInRoom Room? @relation("CurrentSong")
+  id            String   @id @default(cuid())
+  title         String
+  youtubeId     String
+  thumbnail     String
+  votes         Int      @default(0)
+  played        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  code          String
+  currentInRoom Room?    @relation("CurrentSong")
+  room          Room     @relation(fields: [code], references: [code], onDelete: Cascade)
+  voteList      Vote[]
 
   @@unique([code, youtubeId])
   @@index([code, votes])
 }
 
 model Vote {
-  id        String @id @default(cuid())
+  id        String        @id @default(cuid())
   userEmail String
   songId    String
-
-  song RoomQueueSong @relation(fields: [songId], references: [id], onDelete: Cascade)
-  user User          @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  song      RoomQueueSong @relation(fields: [songId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
   @@unique([userEmail, songId])
 }
 
-/* ---------------------------------- */
-/* PLAYLIST SYSTEM */
-/* ---------------------------------- */
-
 model Playlist {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
   leaderEmail String
-  createdAt   DateTime @default(now())
-
-  leader User @relation(fields: [leaderEmail], references: [email], onDelete: Cascade)
-  songs  PlaylistSong[]
+  leader      User           @relation(fields: [leaderEmail], references: [email], onDelete: Cascade)
+  songs       PlaylistSong[]
 }
 
 model PlaylistSong {
@@ -134,8 +112,7 @@ model PlaylistSong {
   youtubeId  String
   thumbnail  String
   createdAt  DateTime @default(now())
-
-  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
 
   @@unique([playlistId, youtubeId])
 }
