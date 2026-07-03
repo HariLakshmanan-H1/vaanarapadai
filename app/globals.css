@@ -208,18 +208,17 @@
 }
 
 
-.stream-custom-theme .str-chat {
-  height: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-}
-
+.stream-custom-theme .str-chat,
+.stream-custom-theme .str-chat-channel,
+.stream-custom-theme .str-chat__channel,
+.stream-custom-theme .str-chat__container,
+.stream-custom-theme .str-chat-container,
 .stream-custom-theme .str-chat__main-panel {
   height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
   min-height: 0 !important;
-  /* CRITICAL: allows the panel to shrink and scroll */
+  flex: 1 !important;
 }
 
 /* Force the message list itself to scroll and fill the remaining space */
