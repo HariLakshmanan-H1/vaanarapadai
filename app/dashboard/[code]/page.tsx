@@ -59,7 +59,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Center Column */}
-        <div className="flex flex-col h-full self-stretch">
+        <div className="flex flex-col lg:h-[calc(100vh-220px)] h-[500px] w-full overflow-hidden">
           <RoomChat roomCode={code as string} />
         </div>
 
